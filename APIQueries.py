@@ -1,5 +1,6 @@
 
 import requests
+from click import style
 from rich.console import Console
 from rich.table import Table
 
@@ -25,7 +26,6 @@ class APIQueries:
             return {"error": str(e)}
 
 
-    #TODO: Create a dictionary so we can pass cities instead of lat and lon
     def forecast(self, lat:float, lon:float):
         """Fetch 5-day weather forecast for a given location.
             :parameters: lat: float, lon: float
@@ -43,8 +43,12 @@ class APIQueries:
     @staticmethod
     def _parse_current_response(response: dict):
         return {
+            'city': response.get('name'),
             'temperature': response.get('main', {}).get('temp'),
             'temp_feels_like': response.get('main', {}).get('feels_like'),
+            'description': response.get('weather', [{}])[0].get('description'),
+            'icon': response.get('weather', [{}])[0].get('icon'),
+            'wind_speed': response.get('wind', {}).get('speed')
         }
 
     @staticmethod
@@ -68,6 +72,7 @@ def format_forecast_response(data):
     table.add_column("Feels like")
     table.add_column("Weather")
 
+
     for occurence in data:
         table.add_row(occurence.get('date'), str(occurence.get('temperature')), str(occurence.get('temp_feels_like')), occurence.get('weather'))
 
@@ -80,8 +85,11 @@ def format_current_response(data):
     table.add_column("Attribute")
     table.add_column("Value")
 
+    table.add_row("City", data.get("city"))
     table.add_row("Temperature", str(data.get("temperature")))
     table.add_row("Feels like", str(data.get("temp_feels_like")))
+    table.add_row("Description", data.get("description"))
+    table.add_row("Wind speed", str(data.get("wind_speed")))
 
     console.print(table)
 
