@@ -21,9 +21,10 @@ class APIQueries:
         except requests.exceptions.RequestException as e:
             return {"error": str(e)}
 
-    def forecast(self, city):
-        url = f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={self.api_key}"
-        response = requests.get(url)
+    def forecast(self, lat:float, lon:float):
+        url = f"https://open-weather13.p.rapidapi.com/city/fivedaysforcast/{lat}/{lon}&units=metric"
+        headers = self.headers
+        response = requests.get(url, headers=headers)
         return response.json()
 
     @staticmethod
